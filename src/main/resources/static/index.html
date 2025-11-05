@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home Page</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #00C9A7, #92FE9D);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 400px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    p {
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #00C9A7;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #00A586;
+    }
+
+    pre {
+      text-align: left;
+      background-color: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #333;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🏠 Welcome to Your Dashboard!</h2>
+    <p>You are securely logged in. Use the button below to call a protected API.</p>
+
+    <button id="apiBtn">🔍 Call Secure API</button>
+    <button onclick="document.getElementById('logoutForm').submit()">🚪 Logout</button>
+
+    <pre id="apiResult"></pre>
+
+    <form id="logoutForm" action="/logout" method="post" style="display:none;"></form>
+  </div>
+
+  <script>
+    document.getElementById('apiBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/hello');
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('apiResult').textContent = JSON.stringify(data, null, 2);
+        } else {
+          document.getElementById('apiResult').textContent = 'Error: ' + res.status;
+        }
+      } catch (e) {
+        document.getElementById('apiResult').textContent = 'Failed to call API: ' + e;
+      }
+    });
+  </script>
+
+</body>
+</html>
