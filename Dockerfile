@@ -1,5 +1,5 @@
-# 1. Use an official OpenJDK base image
-FROM openjdk:17-jdk-slim
+# 1. Use a stable OpenJDK image
+FROM eclipse-temurin:17-jdk
 
 # 2. Set environment variables
 ENV MAVEN_VERSION=3.9.9
@@ -12,23 +12,23 @@ WORKDIR $APP_HOME
 # 4. Install Maven and required tools
 RUN apt-get update && \
     apt-get install -y wget tar && \
-    wget https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
+    wget https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
     tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /opt && \
     ln -s /opt/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/bin/mvn && \
     rm apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-    apt-get clean
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 5. Install MySQL JDBC driver
-RUN wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_DRIVER_VERSION}/mysql-connector-java-${MYSQL_DRIVER_VERSION}.jar -P /usr/share/java/
+# 5. Install MySQL JDBC driver (✅ updated artifact path)
+RUN wget https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/${MYSQL_DRIVER_VERSION}/mysql-connector-j-${MYSQL_DRIVER_VERSION}.jar -P /usr/share/java/
 
-# 6. Copy your project files into the container
+# 6. Copy your project files
 COPY . $APP_HOME
 
-# 7. Build your Java/Maven project
+# 7. Build your project
 RUN mvn clean package -DskipTests
 
-# 8. Expose the application port (e.g., 8080 for Spring Boot)
+# 8. Expose the application port
 EXPOSE 8080
 
-# 9. Run the application (update the jar name as per your project)
-CMD ["java", "-cp", "/usr/share/java/mysql-connector-java-8.0.33.jar:target/your-app.jar", "com.example.YourMainClass"]
+# 9. Run your app (auto-detect JAR name)
+CMD ["sh", "-c", "java -cp '/usr/share/java/mysql-connector-j-8.0.33.jar:target/*.jar' $(grep 'mainClass' pom.xml | sed -E 's/.*<mainClass>(.*)<\\/mainClass>.*/\\1/')"]
