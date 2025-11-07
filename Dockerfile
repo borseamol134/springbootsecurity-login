@@ -31,4 +31,4 @@ RUN mvn clean package -DskipTests
 EXPOSE 8080
 
 # 9. Run your app (auto-detect JAR name)
-CMD ["sh", "-c", "java -cp '/usr/share/java/mysql-connector-j-8.0.33.jar:target/*.jar' $(grep 'mainClass' pom.xml | sed -E 's/.*<mainClass>(.*)<\\/mainClass>.*/\\1/')"]
+CMD ["sh", "-c", "java -jar target/*.jar"]
